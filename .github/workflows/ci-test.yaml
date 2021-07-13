@@ -46,6 +46,34 @@ jobs:
           name: code-coverage-report
           path: cobertura.xml
 
+  typecheck:
+    # NOTE: This name appears in GitHub's Checks API.
+    name: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js LTS
+        uses: actions/setup-node@v2.1.4
+        with:
+          node-version: "14.x"
+
+      - name: Set up npm
+        run: npm install npm@7 -g
+
+      - name: Install Node deps
+        working-directory: client-sdk/ts-web
+        run: npm ci
+
+      - name: Prepare client-sdk/ts-web
+        working-directory: client-sdk/ts-web
+        run: npm run-script prepare
+
+      - name: Check client-sdk/ts-web playground
+        working-directory: client-sdk/ts-web
+        run: npm run-script check-playground
+
   e2e-ts-web:
     # NOTE: This name appears in GitHub's Checks API.
     name: e2e-ts-web
@@ -65,10 +93,6 @@ jobs:
       - name: Install Node deps
         working-directory: client-sdk/ts-web
         run: npm ci
-
-      - name: 'dev-server: Check types'
-        working-directory: client-sdk/ts-web
-        run: npm run-script check-playground
 
       - name: 'dev-server: Start'
         working-directory: client-sdk/ts-web
